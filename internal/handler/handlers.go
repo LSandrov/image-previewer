@@ -1,7 +1,6 @@
 package handler
 
-type Handlers struct {
-}
+type Handlers struct{}
 
 func NewHandlers() *Handlers {
 	//@TODO fixme

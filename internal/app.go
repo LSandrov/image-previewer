@@ -1,11 +1,12 @@
 package internal
 
 import (
+	"net/http"
+
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
 	"image-previewer/internal/handler"
 	"image-previewer/pkg/cache"
-	"net/http"
 )
 
 type App struct {

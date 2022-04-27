@@ -1,13 +1,12 @@
 package main
 
 import (
+	"image-previewer/internal"
+	"image-previewer/pkg/cache"
+
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"image-previewer/internal"
-	"image-previewer/pkg/cache"
-	"image-previewer/pkg/cache/lru"
-	"sync"
 )
 
 var shaCommit = "local"
@@ -18,7 +17,6 @@ func main() {
 
 	viper.SetConfigFile(".env")
 	err := viper.ReadInConfig()
-
 	if err != nil {
 		l.Fatal().Err(err).Msg("Ошибка загрузки env файла %s")
 	}
@@ -27,15 +25,7 @@ func main() {
 	if !ok {
 		l.Fatal().Err(err).Msg("Неизвестная переменная окружения")
 	}
-
-	var mu sync.Mutex
-
-	lruCache := cache.NewLruCache(
-		lruCacheCapacity,
-		new(lru.List),
-		make(map[string]*lru.ListItem, lruCacheCapacity),
-		&mu,
-	)
+	lruCache := cache.NewCache(lruCacheCapacity)
 
 	app := internal.NewApp(l, lruCache)
 	app.Run()
