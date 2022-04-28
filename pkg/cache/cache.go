@@ -1,6 +1,7 @@
 package cache
 
 type Cache interface {
-	Get(key string) (val []byte, err error)
-	Set(key string, val []byte) (err error)
+	Get(key string) (interface{}, bool)
+	Set(key string, val interface{}) bool
+	Clear()
 }
