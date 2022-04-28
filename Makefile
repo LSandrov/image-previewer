@@ -16,10 +16,10 @@ GO_BUILD = GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) $(GO) build
 
 .PHONY: build
 build:
-	$(GO_BUILD) -ldflags="-X 'main.shaCommit=$(SHA_COMMIT)'" -mod vendor -trimpath -o ./bin/app ./cmd/server
+	$(GO_BUILD) -ldflags="-X 'main.shaCommit=$(SHA_COMMIT)'" -trimpath -o ./bin/app ./cmd
 
 .PHONY: tests
-test-functional:
+tests:
 	$(GO) test -race -cover -tags musl -short -v \
 				-coverprofile profile.cov.tmp -p 100 \
 				./pkg/... ./internal/...
