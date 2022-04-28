@@ -17,18 +17,6 @@ GO_BUILD = GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) $(GO) build
 .PHONY: build
 build:
 	$(GO_BUILD) -ldflags="-X 'main.shaCommit=$(SHA_COMMIT)'" -trimpath -o ./bin/app ./cmd
-
-.PHONY: tests
-tests:
-	$(GO) test -race -cover -tags musl -short -v \
-				-coverprofile profile.cov.tmp -p 100 \
-				./pkg/... ./internal/...
-	cat profile.cov.tmp | grep -v "_gen.go" > profile.cov
-	$(MAKE) cover
-
-.PHONY: cover
-cover:
-	$(GO) tool cover -func profile.cov
 ################################################################################################ lint
 
 .PHONY: lint
