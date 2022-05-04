@@ -3,17 +3,15 @@ package previewer
 import (
 	"context"
 	"errors"
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 	"reflect"
 	"testing"
 	"time"
 )
 
-const ImageUrl = "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/"
+const ImageURL = "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/"
 
 func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
-	logger := log.With().Str("test", "test").Logger()
 	ctx := context.Background()
 
 	tests := []struct {
@@ -31,17 +29,15 @@ func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.imgName, func(t *testing.T) {
-			d := &DefaultImageDownloader{
-				l: logger,
-			}
-			gotImg, err := d.DownloadByUrl(tt.ctx, ImageUrl+tt.imgName)
+			d := &DefaultImageDownloader{}
+			gotImg, err := d.DownloadByUrl(tt.ctx, ImageURL+tt.imgName)
 			if err != nil {
 				t.Errorf("DownloadByUrl() error = %v", err)
 				return
 			}
 
 			wantImg := loadImage(tt.imgName)
-			if !reflect.DeepEqual(gotImg, wantImg) {
+			if !reflect.DeepEqual(gotImg.img, wantImg) {
 				t.Errorf("DownloadByUrl() gotImg = %v, want %v", gotImg, wantImg)
 			}
 		})
@@ -49,9 +45,9 @@ func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 }
 
 func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
-	logger := log.With().Str("test", "test").Logger()
 	ctx := context.Background()
-	ctxWithTimeOut, _ := context.WithTimeout(ctx, time.Microsecond*1)
+	ctxWithTimeOut, closefn := context.WithTimeout(ctx, time.Microsecond*1)
+	defer closefn()
 
 	tests := []struct {
 		ctx     context.Context
@@ -62,13 +58,13 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 		{
 			ctx:     ctxWithTimeOut,
 			imgName: "gopher_200x700.jpg",
-			url:     ImageUrl,
+			url:     ImageURL,
 			err:     ErrTimeout,
 		},
 		{
 			ctx:     ctxWithTimeOut,
 			imgName: "gopher_1024x252.jpg",
-			url:     ImageUrl,
+			url:     ImageURL,
 			err:     ErrTimeout,
 		},
 		{
@@ -80,9 +76,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.imgName, func(t *testing.T) {
-			d := &DefaultImageDownloader{
-				l: logger,
-			}
+			d := &DefaultImageDownloader{}
 			_, err := d.DownloadByUrl(tt.ctx, tt.url+tt.imgName)
 			require.Errorf(t, err, tt.err.Error())
 		})

@@ -3,12 +3,11 @@ package handler
 import (
 	"context"
 	"errors"
+	"github.com/gorilla/mux"
 	"net/http"
 	"net/url"
 	"strconv"
 	"time"
-
-	"github.com/gorilla/mux"
 )
 
 type FillRequest struct {
@@ -18,44 +17,50 @@ type FillRequest struct {
 }
 
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1)*time.Second)
+	defer cancel()
+
 	vars := mux.Vars(r)
-	request := &FillRequest{}
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*2)
 
-	err := h.validateFillHandler(vars, request)
+	request, err := h.parseFillHandlerVars(vars)
 	if err != nil {
 		w.WriteHeader(502)
 		return
 	}
 
-	img, err := h.svc.Fill(ctx, request.width, request.height, request.url)
+	fillResponse, err := h.svc.Fill(ctx, request.width, request.height, request.url)
 	if err != nil {
 		w.WriteHeader(502)
 		return
 	}
 
-	w.Header().Set("Content-Type", "image/jpeg")
-	w.Header().Set("Content-Length", strconv.Itoa(len(img)))
-	if _, err := w.Write(img); err != nil {
+	for name, values := range fillResponse.Headers {
+		for _, value := range values {
+			w.Header().Set(name, value)
+		}
+	}
+
+	w.Header().Set("Content-Length", strconv.Itoa(len(fillResponse.Img)))
+	if _, err := w.Write(fillResponse.Img); err != nil {
 		w.WriteHeader(502)
 		h.l.Error().Msg("Невозможно обработать изображение")
 	}
 }
 
-func (h *Handlers) validateFillHandler(vars map[string]string, r *FillRequest) (err error) {
+func (h *Handlers) parseFillHandlerVars(vars map[string]string) (r *FillRequest, err error) {
 	if r.width, err = strconv.Atoi(vars["width"]); err != nil {
-		return errors.New("поле width должно быть целочисленным")
+		return nil, errors.New("поле width должно быть целочисленным")
 	}
 	if r.height, err = strconv.Atoi(vars["height"]); err != nil {
-		return errors.New("поле width должно быть целочисленным")
+		return nil, errors.New("поле width должно быть целочисленным")
 	}
 
 	imageUrl, err := url.ParseRequestURI(vars["imageUrl"])
 	if err != nil {
-		return errors.New("поле imageUrl должно быть ссылкой")
+		return nil, errors.New("поле imageUrl должно быть ссылкой")
 	}
 
 	r.url = imageUrl.String()
 
-	return nil
+	return r, nil
 }

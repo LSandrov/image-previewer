@@ -12,21 +12,22 @@ import (
 )
 
 type App struct {
-	l zerolog.Logger
-	c cache.Cache
+	l             zerolog.Logger
+	cacheCapacity int
 }
 
 func NewApp(l zerolog.Logger, cacheCapacity int) *App {
 	return &App{
-		l: l,
-		c: cache.NewCache(cacheCapacity),
+		l:             l,
+		cacheCapacity: cacheCapacity,
 	}
 }
 
 func (a *App) Run() {
 	r := mux.NewRouter()
-	downloader := previewer.NewDefaultImageDownloader(a.l)
-	svc := previewer.NewDefaultService(a.l, downloader, a.c)
+	c := cache.NewCache(a.cacheCapacity)
+	downloader := previewer.NewDefaultImageDownloader()
+	svc := previewer.NewDefaultService(a.l, downloader, c)
 	handlers := handler.NewHandlers(a.l, svc)
 
 	r.HandleFunc("/fill/{width:[0-9]+}/{height:[0-9]+}/{imageUrl:.*}", handlers.FillHandler)
@@ -38,5 +39,7 @@ func (a *App) Run() {
 		Handler:      r,
 	}
 
-	srv.ListenAndServe()
+	if err := srv.ListenAndServe(); err != nil {
+		a.l.Fatal().Err(err).Msg("error starting http server")
+	}
 }

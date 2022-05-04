@@ -15,8 +15,7 @@ func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	l := log.With().Str("sha_commit", shaCommit).Logger()
 
-	err := godotenv.Load()
-	if err != nil {
+	if err := godotenv.Load(); err != nil {
 		l.Fatal().Err(err).Msg("Error loading .env file")
 	}
 
