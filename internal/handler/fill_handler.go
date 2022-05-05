@@ -17,7 +17,7 @@ type FillRequest struct {
 }
 
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1)*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1000)*time.Second)
 	defer cancel()
 
 	vars := mux.Vars(r)
@@ -47,13 +47,22 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) parseFillHandlerVars(vars map[string]string) (r *FillRequest, err error) {
-	if r.width, err = strconv.Atoi(vars["width"]); err != nil {
+func (h *Handlers) parseFillHandlerVars(vars map[string]string) (*FillRequest, error) {
+	r := &FillRequest{}
+
+	width, err := strconv.Atoi(vars["width"])
+	if err != nil {
 		return nil, errors.New("поле width должно быть целочисленным")
 	}
-	if r.height, err = strconv.Atoi(vars["height"]); err != nil {
+
+	r.width = width
+
+	height, err := strconv.Atoi(vars["height"])
+	if err != nil {
 		return nil, errors.New("поле width должно быть целочисленным")
 	}
+
+	r.height = height
 
 	imageUrl, err := url.ParseRequestURI(vars["imageUrl"])
 	if err != nil {
