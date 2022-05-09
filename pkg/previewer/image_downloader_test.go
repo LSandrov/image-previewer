@@ -82,3 +82,22 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 		})
 	}
 }
+
+func TestNewDefaultImageDownloader(t *testing.T) {
+	tests := []struct {
+		name string
+		want ImageDownloader
+	}{
+		{
+			name: "good",
+			want: &DefaultImageDownloader{},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewDefaultImageDownloader(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewDefaultImageDownloader() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

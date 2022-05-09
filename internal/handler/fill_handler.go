@@ -1,13 +1,11 @@
 package handler
 
 import (
-	"context"
 	"errors"
 	"github.com/gorilla/mux"
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 type FillRequest struct {
@@ -17,20 +15,21 @@ type FillRequest struct {
 }
 
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(1000)*time.Second)
-	defer cancel()
-
 	vars := mux.Vars(r)
 
 	request, err := h.parseFillHandlerVars(vars)
 	if err != nil {
-		w.WriteHeader(502)
+		w.WriteHeader(500)
+		h.l.Err(err).Msg("Ошибка при валидации входных данных")
+		w.Write([]byte("Ошибка при валидации входных данных"))
 		return
 	}
 
-	fillResponse, err := h.svc.Fill(ctx, request.width, request.height, request.url)
+	fillResponse, err := h.svc.Fill(r.Context(), request.width, request.height, request.url)
 	if err != nil {
-		w.WriteHeader(502)
+		w.WriteHeader(500)
+		h.l.Err(err).Msg("Невозможно обработать изображение")
+		w.Write([]byte("Невозможно обработать изображение"))
 		return
 	}
 
@@ -42,8 +41,10 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Length", strconv.Itoa(len(fillResponse.Img)))
 	if _, err := w.Write(fillResponse.Img); err != nil {
-		w.WriteHeader(502)
-		h.l.Error().Msg("Невозможно обработать изображение")
+		w.WriteHeader(500)
+		w.Write([]byte("Проблемы с обработкой ответа"))
+		h.l.Err(err).Msg("Проблемы с обработкой ответа")
+		return
 	}
 }
 
@@ -64,10 +65,12 @@ func (h *Handlers) parseFillHandlerVars(vars map[string]string) (*FillRequest, e
 
 	r.height = height
 
-	imageUrl, err := url.ParseRequestURI(vars["imageUrl"])
+	imageUrl, err := url.Parse(vars["imageUrl"])
 	if err != nil {
 		return nil, errors.New("поле imageUrl должно быть ссылкой")
 	}
+
+	imageUrl.Scheme = "https"
 
 	r.url = imageUrl.String()
 

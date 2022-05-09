@@ -8,6 +8,7 @@ import (
 	"github.com/rs/zerolog"
 	"image-previewer/pkg/cache"
 	"image/jpeg"
+	"io"
 	"os"
 	"time"
 )
@@ -29,6 +30,9 @@ func NewDefaultService(l zerolog.Logger, downloader ImageDownloader, c cache.Cac
 }
 
 func (svc *DefaultService) Fill(ctx context.Context, width, height int, imgURL string) (*FillResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(1000)*time.Second)
+	defer cancel()
+
 	cacheKey := svc.cache.MakeCacheKeyResizes(width, height, imgURL)
 	cached, ok := svc.cache.Get(cacheKey)
 
@@ -48,11 +52,11 @@ func (svc *DefaultService) Fill(ctx context.Context, width, height int, imgURL s
 
 	downloaded, err := svc.downloader.DownloadByUrl(ctx, imgURL)
 	if err != nil {
-		svc.l.Error().Msg("Невозможно загрузить изображение")
+		svc.l.Err(err).Msg("Невозможно загрузить изображение")
 		return nil, err
 	}
 
-	go svc.cache.Set(cache.Item{
+	svc.cache.Set(cache.Item{
 		Key:    cacheKeyDownloaded,
 		Img:    downloaded.img,
 		Header: downloaded.headers,
@@ -64,13 +68,13 @@ func (svc *DefaultService) Fill(ctx context.Context, width, height int, imgURL s
 		return nil, err
 	}
 
-	go svc.cache.Set(cache.Item{
+	svc.cache.Set(cache.Item{
 		Key:    cacheKey,
 		Img:    resizedImg,
 		Header: downloaded.headers,
 	})
 
-	fillResponse := NewFillResponse(downloaded.img, downloaded.headers)
+	fillResponse := NewFillResponse(resizedImg, downloaded.headers)
 
 	return fillResponse, nil
 }
@@ -96,6 +100,11 @@ func (svc *DefaultService) resize(img []byte, width, height int) ([]byte, error)
 			svc.l.Err(err).Msg("ошибка при удалении временного файла")
 		}
 	}(tmpImgName)
+
+	_, err = io.Copy(file, bytes.NewReader(img))
+	if err != nil {
+		svc.l.Err(err).Msg(err.Error())
+	}
 
 	src, err := imaging.Open(tmpImgName)
 	if err != nil {

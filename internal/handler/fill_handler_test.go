@@ -9,16 +9,15 @@ import (
 	mock_previewer "image-previewer/pkg/previewer/mock"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 )
 
-const ImageURL = "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/"
-
 func TestHandlers_FillHandler(t *testing.T) {
-	ctrl := gomock.NewController(nil)
+	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockService := mock_previewer.NewMockService(ctrl)
+
 	l := log.With().Logger()
 
 	image1 := loadImage("gopher_200x700.jpg")
@@ -26,39 +25,42 @@ func TestHandlers_FillHandler(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		width        string
-		height       string
+		width        int
+		height       int
 		url          string
 		response     string
 		fillResponse *previewer.FillResponse
+		err          error
 	}{
 		{
 			name:         "good",
-			width:        "200",
-			height:       "300",
+			width:        200,
+			height:       300,
 			url:          "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_200x700.jpg",
 			response:     string(image1),
 			fillResponse: &previewer.FillResponse{Img: image1},
 		},
 		{
-			name:         "good",
-			width:        "200",
-			height:       "300",
+			name:         "good1",
+			width:        300,
+			height:       400,
 			url:          "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_1024x252.jpg",
 			response:     string(image2),
 			fillResponse: &previewer.FillResponse{Img: image2},
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, "http://example.com", nil)
 			req = mux.SetURLVars(req, map[string]string{
-				"width":    tt.width,
-				"height":   tt.height,
+				"width":    strconv.Itoa(tt.width),
+				"height":   strconv.Itoa(tt.height),
 				"imageUrl": tt.url,
 			})
 
-			mockService.EXPECT().Fill(req.Context(), tt.width, tt.height, tt.url).Return(tt.fillResponse, nil)
+			mockService := mock_previewer.NewMockService(ctrl)
+			mockService.EXPECT().Fill(req.Context(), tt.width, tt.height, tt.url).Return(tt.fillResponse, tt.err)
 			h := &Handlers{
 				l:   l,
 				svc: mockService,
