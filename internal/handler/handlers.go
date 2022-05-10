@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"image-previewer/pkg/previewer"
+	"github.com/LSandrov/image-previewer/pkg/previewer"
 
 	"github.com/rs/zerolog"
 )

@@ -5,7 +5,7 @@
 package mock_previewer
 
 import (
-	previewer "image-previewer/pkg/previewer"
+	previewer "github.com/LSandrov/image-previewer/pkg/previewer"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

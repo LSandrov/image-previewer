@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"image-previewer/pkg/previewer"
-	mock_previewer "image-previewer/pkg/previewer/mock"
+	"github.com/LSandrov/image-previewer/pkg/previewer"
+	mock_previewer "github.com/LSandrov/image-previewer/pkg/previewer/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
