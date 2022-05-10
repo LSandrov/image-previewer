@@ -13,16 +13,14 @@ import (
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 	fillParams, err := h.parseFillHandlerVars(r.Context(), mux.Vars(r), r.Header)
 	if err != nil {
-		w.WriteHeader(500)
-		h.l.Err(err).Msg("Ошибка при валидации входных данных")
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Ошибка при валидации входных данных"))
 		return
 	}
 
 	fillResponse, err := h.svc.Fill(fillParams)
 	if err != nil {
-		w.WriteHeader(500)
-		h.l.Err(err).Msg("Невозможно обработать изображение")
+		w.WriteHeader(http.StatusBadGateway)
 		w.Write([]byte("Невозможно обработать изображение"))
 		return
 	}
@@ -33,10 +31,8 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Length", strconv.Itoa(len(fillResponse.Img)))
 	if _, err := w.Write(fillResponse.Img); err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte("Проблемы с обработкой ответа"))
+		w.WriteHeader(http.StatusInternalServerError)
 		h.l.Err(err).Msg("Проблемы с обработкой ответа")
 		return
 	}
