@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"image-previewer/pkg/previewer"
+	"github.com/LSandrov/image-previewer/pkg/previewer"
 
 	"github.com/gorilla/mux"
 )

@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"time"
 
-	"image-previewer/internal/handler"
-	"image-previewer/pkg/cache"
-	"image-previewer/pkg/previewer"
+	"github.com/LSandrov/image-previewer/internal/handler"
+	"github.com/LSandrov/image-previewer/pkg/cache"
+	"github.com/LSandrov/image-previewer/pkg/previewer"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"

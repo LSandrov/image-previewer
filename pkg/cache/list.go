@@ -1,40 +1,40 @@
-package lru
+package cache
 
 type List interface {
 	Len() int
-	Front() *Item
-	Back() *Item
-	PushFront(v interface{}) *Item
-	PushBack(v interface{}) *Item
-	Remove(i *Item)
-	MoveToFront(i *Item)
+	Front() *ListItem
+	Back() *ListItem
+	PushFront(v interface{}) *ListItem
+	PushBack(v interface{}) *ListItem
+	Remove(i *ListItem)
+	MoveToFront(i *ListItem)
 }
 
 type list struct {
 	len         int
-	front, back *Item
+	front, back *ListItem
 }
 
-type Item struct {
+type ListItem struct {
 	Value interface{}
-	Next  *Item
-	Prev  *Item
+	Next  *ListItem
+	Prev  *ListItem
 }
 
 func (l *list) Len() int {
 	return l.len
 }
 
-func (l *list) Front() *Item {
+func (l *list) Front() *ListItem {
 	return l.front
 }
 
-func (l *list) Back() *Item {
+func (l *list) Back() *ListItem {
 	return l.back
 }
 
-func (l *list) PushFront(v interface{}) *Item {
-	listItem := &Item{Value: v, Next: l.front}
+func (l *list) PushFront(v interface{}) *ListItem {
+	listItem := &ListItem{Value: v, Next: l.front}
 
 	if l.front == nil {
 		l.back = listItem
@@ -48,8 +48,8 @@ func (l *list) PushFront(v interface{}) *Item {
 	return listItem
 }
 
-func (l *list) PushBack(v interface{}) *Item {
-	listItem := &Item{Value: v, Prev: l.back}
+func (l *list) PushBack(v interface{}) *ListItem {
+	listItem := &ListItem{Value: v, Prev: l.back}
 
 	if l.back == nil {
 		l.back = listItem
@@ -63,13 +63,13 @@ func (l *list) PushBack(v interface{}) *Item {
 	return listItem
 }
 
-func (l *list) Remove(i *Item) {
+func (l *list) Remove(i *ListItem) {
 	l.pos(i)
 
 	l.len--
 }
 
-func (l *list) MoveToFront(i *Item) {
+func (l *list) MoveToFront(i *ListItem) {
 	if l.front == i {
 		return
 	}
@@ -92,7 +92,7 @@ func NewList() List {
 	return new(list)
 }
 
-func (l *list) pos(i *Item) {
+func (l *list) pos(i *ListItem) {
 	if i.Next != nil {
 		i.Next.Prev = i.Prev
 	} else {

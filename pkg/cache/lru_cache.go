@@ -3,22 +3,20 @@ package cache
 import (
 	"fmt"
 	"sync"
-
-	"image-previewer/pkg/cache/lru"
 )
 
 type lruCache struct {
 	capacity int
-	queue    lru.List
-	items    map[string]*lru.Item
+	queue    List
+	items    map[string]*ListItem
 	mu       *sync.Mutex
 }
 
 func NewCache(capacity int) Cache {
 	return &lruCache{
 		capacity: capacity,
-		queue:    lru.NewList(),
-		items:    make(map[string]*lru.Item, capacity),
+		queue:    NewList(),
+		items:    make(map[string]*ListItem, capacity),
 		mu:       new(sync.Mutex),
 	}
 }
@@ -71,8 +69,8 @@ func (c *lruCache) Get(key string) (*Item, bool) {
 }
 
 func (c *lruCache) Clear() {
-	c.queue = lru.NewList()
-	c.items = make(map[string]*lru.Item, c.capacity)
+	c.queue = NewList()
+	c.items = make(map[string]*ListItem, c.capacity)
 }
 
 func (c *lruCache) MakeCacheKeyResizes(width, height int, url string) string {
