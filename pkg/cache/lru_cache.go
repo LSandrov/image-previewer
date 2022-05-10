@@ -58,8 +58,8 @@ func (c *lruCache) Get(key string) (*Item, bool) {
 	if item, ok := c.items[key]; ok {
 		c.queue.MoveToFront(item)
 
-		cachedItem, okCache := item.Value.(*Item)
-		if okCache != true {
+		cachedItem, ok := item.Value.(*Item)
+		if !ok {
 			return nil, false
 		}
 
@@ -79,5 +79,5 @@ func (c *lruCache) MakeCacheKeyResizes(width, height int, url string) string {
 }
 
 func (c *lruCache) MakeCacheKeyDownloaded(url string) string {
-	return fmt.Sprintf("%s", url)
+	return url
 }

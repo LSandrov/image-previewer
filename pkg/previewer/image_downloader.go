@@ -2,10 +2,11 @@ package previewer
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -15,11 +16,10 @@ var (
 )
 
 type ImageDownloader interface {
-	DownloadByUrl(ctx context.Context, url string, headers map[string][]string) (*DownloadedImage, error)
+	DownloadByURL(ctx context.Context, url string, headers map[string][]string) (*DownloadedImage, error)
 }
 
-type DefaultImageDownloader struct {
-}
+type DefaultImageDownloader struct{}
 
 type DownloadedImage struct {
 	img     []byte
@@ -30,10 +30,13 @@ func NewDefaultImageDownloader() ImageDownloader {
 	return &DefaultImageDownloader{}
 }
 
-func (d *DefaultImageDownloader) DownloadByUrl(ctx context.Context, url string, headers map[string][]string) (*DownloadedImage, error) {
+func (d *DefaultImageDownloader) DownloadByURL(
+	ctx context.Context,
+	url string,
+	headers map[string][]string,
+) (*DownloadedImage, error) {
 	client := http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
-
 	if err != nil {
 		return nil, errors.Wrap(err, ErrRequest.Error())
 	}
@@ -76,7 +79,7 @@ func (d *DefaultImageDownloader) validate(img []byte) error {
 	}
 
 	imgStr := string(img)
-	for format, _ := range allowedFormats {
+	for format := range allowedFormats {
 		if strings.HasPrefix(imgStr, format) {
 			return nil
 		}

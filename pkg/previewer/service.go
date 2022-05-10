@@ -5,18 +5,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/disintegration/imaging"
-	"github.com/rs/zerolog"
 	"image-previewer/pkg/cache"
 	"image/jpeg"
 	"io"
 	"os"
 	"time"
+
+	"github.com/disintegration/imaging"
+	"github.com/rs/zerolog"
 )
 
-// Service сервис для обрезки изображений
+// Service сервис для обрезки изображений.
 type Service interface {
-	// Fill скачивает изображение, обрезает его. Данные кешируются
+	// Fill скачивает изображение, обрезает его. Данные кешируются.
 	Fill(params *FillParams) (*FillResponse, error)
 }
 
@@ -27,7 +28,12 @@ type DefaultService struct {
 	downloadedCache cache.Cache
 }
 
-func NewDefaultService(l zerolog.Logger, downloader ImageDownloader, resizedCache cache.Cache, downloadedCache cache.Cache) Service {
+func NewDefaultService(
+	l zerolog.Logger,
+	downloader ImageDownloader,
+	resizedCache cache.Cache,
+	downloadedCache cache.Cache,
+) Service {
 	return &DefaultService{
 		l:               l,
 		downloader:      downloader,
@@ -56,7 +62,7 @@ func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
 	if ok {
 		downloaded = &DownloadedImage{img: cachedImage.Img, headers: cachedImage.Header}
 	} else {
-		downloaded, err := svc.downloader.DownloadByUrl(ctx, params.url, params.headers)
+		downloaded, err := svc.downloader.DownloadByURL(ctx, params.url, params.headers)
 		if err != nil {
 			svc.l.Err(err).Msg("Невозможно загрузить изображение")
 			return nil, err

@@ -3,11 +3,12 @@ package handler
 import (
 	"context"
 	"errors"
-	"github.com/gorilla/mux"
 	"image-previewer/pkg/previewer"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +39,11 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) parseFillHandlerVars(ctx context.Context, vars map[string]string, headers map[string][]string) (*previewer.FillParams, error) {
+func (h *Handlers) parseFillHandlerVars(
+	ctx context.Context,
+	vars map[string]string,
+	headers map[string][]string,
+) (*previewer.FillParams, error) {
 	width, err := strconv.Atoi(vars["width"])
 	if err != nil {
 		return nil, errors.New("поле width должно быть целочисленным")
@@ -49,13 +54,13 @@ func (h *Handlers) parseFillHandlerVars(ctx context.Context, vars map[string]str
 		return nil, errors.New("поле width должно быть целочисленным")
 	}
 
-	imageUrl, err := url.Parse(vars["imageUrl"])
+	imageURL, err := url.Parse(vars["imageURL"])
 	if err != nil {
-		return nil, errors.New("поле imageUrl должно быть ссылкой")
+		return nil, errors.New("поле imageURL должно быть ссылкой")
 	}
 
-	//Условие тз: Работаем только с HTTP.
-	imageUrl.Scheme = "http"
+	// Условие тз: Работаем только с HTTP.
+	imageURL.Scheme = "http"
 
-	return previewer.NewFillParams(ctx, width, height, imageUrl.String(), headers), nil
+	return previewer.NewFillParams(ctx, width, height, imageURL.String(), headers), nil
 }

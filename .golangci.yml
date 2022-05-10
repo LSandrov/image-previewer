@@ -1,5 +1,5 @@
 run:
-  tests: true
+  tests: false
 
 linters-settings:
   funlen:
@@ -29,7 +29,6 @@ linters:
     - exhaustive
     - exportloopref
     - funlen
-    - gci
     - gocognit
     - goconst
     - gocritic
@@ -44,7 +43,6 @@ linters:
     - govet
     - ifshort
     - importas
-    - ineffassign
     - lll
     - makezero
     - misspell

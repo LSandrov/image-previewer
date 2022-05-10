@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"github.com/rs/zerolog"
 	"image-previewer/pkg/previewer"
 	"reflect"
 	"testing"
+
+	"github.com/rs/zerolog"
 )
 
 func TestNewHandlers(t *testing.T) {

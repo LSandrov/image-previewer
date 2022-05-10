@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"image-previewer/internal"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 var shaCommit = "local"

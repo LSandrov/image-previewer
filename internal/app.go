@@ -1,14 +1,14 @@
 package internal
 
 import (
+	"image-previewer/internal/handler"
+	"image-previewer/pkg/cache"
 	"image-previewer/pkg/previewer"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"
-	"image-previewer/internal/handler"
-	"image-previewer/pkg/cache"
 )
 
 type App struct {
@@ -31,7 +31,7 @@ func (a *App) Run() {
 	svc := previewer.NewDefaultService(a.l, downloader, resizedCache, downloadedCache)
 	handlers := handler.NewHandlers(a.l, svc)
 
-	r.HandleFunc("/fill/{width:[0-9]+}/{height:[0-9]+}/{imageUrl:.*}", handlers.FillHandler)
+	r.HandleFunc("/fill/{width:[0-9]+}/{height:[0-9]+}/{imageURL:.*}", handlers.FillHandler)
 	srv := &http.Server{
 		Addr:         "0.0.0.0:8080",
 		WriteTimeout: time.Second * 15,

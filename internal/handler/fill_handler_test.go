@@ -2,10 +2,6 @@ package handler
 
 import (
 	"errors"
-	"github.com/golang/mock/gomock"
-	"github.com/gorilla/mux"
-	"github.com/rs/zerolog/log"
-	"github.com/stretchr/testify/require"
 	"image-previewer/pkg/previewer"
 	mock_previewer "image-previewer/pkg/previewer/mock"
 	"net/http"
@@ -13,6 +9,11 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/gorilla/mux"
+	"github.com/rs/zerolog/log"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHandlers_FillHandler(t *testing.T) {
@@ -23,7 +24,6 @@ func TestHandlers_FillHandler(t *testing.T) {
 	l := log.With().Logger()
 
 	image1 := loadImage("gopher_200x700.jpg")
-	//image2 := loadImage("gopher_1024x252.jpg")
 
 	tests := []struct {
 		name         string
@@ -39,7 +39,7 @@ func TestHandlers_FillHandler(t *testing.T) {
 			name:         "good response",
 			width:        200,
 			height:       300,
-			url:          "http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_200x700.jpg",
+			url:          "http://raw.githubusercontent.com/gopher_200x700.jpg",
 			response:     string(image1),
 			fillResponse: &previewer.FillResponse{Img: image1},
 			httpStatus:   http.StatusOK,
@@ -56,7 +56,7 @@ func TestHandlers_FillHandler(t *testing.T) {
 			name:         "fill error",
 			width:        300,
 			height:       400,
-			url:          "http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_200x700.jpg",
+			url:          "http://raw.githubusercontent.com/gopher_200x700.jpg",
 			response:     "Невозможно обработать изображение",
 			fillResponse: nil,
 			httpStatus:   http.StatusBadGateway,

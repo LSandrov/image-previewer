@@ -9,7 +9,6 @@ import (
 func loadImage(imgName string) []byte {
 	fileToBeUploaded := "./img_test/" + imgName
 	file, err := os.Open(fileToBeUploaded)
-
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -22,7 +21,7 @@ func loadImage(imgName string) []byte {
 
 	// read file into bytes
 	buffer := bufio.NewReader(file)
-	_, err = buffer.Read(bytes)
+	_, _ = buffer.Read(bytes)
 
 	return bytes
 }
