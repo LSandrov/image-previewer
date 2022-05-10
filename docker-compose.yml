@@ -1,0 +1,29 @@
+version: "3.6"
+
+networks:
+  previewer:
+
+services:
+  ipreviewer:
+    image: alpine:latest
+    ports:
+      - "8080"
+    volumes:
+      - ./bin:/var/www
+    environment:
+      - LRU_CACHE_CAPACITY=${LRU_CACHE_CAPACITY}
+    command:
+      - ./var/www/app
+    networks:
+      - previewer
+
+  nginx:
+    image: nginx:1.21.4
+    ports:
+      - "80:80"
+    volumes:
+      - ./build/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - "ipreviewer"
+    networks:
+      - previewer

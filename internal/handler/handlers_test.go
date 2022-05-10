@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"image-previewer/pkg/previewer"
 	"reflect"
 	"testing"
+
+	"image-previewer/pkg/previewer"
 
 	"github.com/rs/zerolog"
 )

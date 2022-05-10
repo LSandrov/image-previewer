@@ -2,8 +2,9 @@ package cache
 
 import (
 	"fmt"
-	"image-previewer/pkg/cache/lru"
 	"sync"
+
+	"image-previewer/pkg/cache/lru"
 )
 
 type lruCache struct {

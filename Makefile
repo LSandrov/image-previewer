@@ -13,6 +13,7 @@ GOARCH = amd64
 CGO_ENABLED = 0
 GO = $(shell which go)
 GO_BUILD = GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=$(CGO_ENABLED) $(GO) build
+SHA_COMMIT = $(shell git rev-parse --short HEAD)
 
 ################################################################################################ build
 
@@ -49,9 +50,9 @@ cover:
 ################################################################################################ docker
 
 .PHONY: docker-up
-test-docker-up: ## Start containers
-	docker-compose up -d
+docker-up: ## Start containers
+	make build && docker-compose up -d
 
 .PHONY: docker-down
-test-docker-down: ## Stop containers
+docker-down: ## Stop containers
 	docker-compose down

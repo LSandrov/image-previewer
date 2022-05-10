@@ -5,11 +5,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"image-previewer/pkg/cache"
 	"image/jpeg"
 	"io"
 	"os"
 	"time"
+
+	"image-previewer/pkg/cache"
 
 	"github.com/disintegration/imaging"
 	"github.com/rs/zerolog"

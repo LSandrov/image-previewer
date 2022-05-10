@@ -2,13 +2,14 @@ package handler
 
 import (
 	"errors"
-	"image-previewer/pkg/previewer"
-	mock_previewer "image-previewer/pkg/previewer/mock"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
+
+	"image-previewer/pkg/previewer"
+	mock_previewer "image-previewer/pkg/previewer/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
