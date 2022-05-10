@@ -1,11 +1,12 @@
 package internal
 
 import (
+	"net/http"
+	"time"
+
 	"image-previewer/internal/handler"
 	"image-previewer/pkg/cache"
 	"image-previewer/pkg/previewer"
-	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog"

@@ -3,10 +3,11 @@ package handler
 import (
 	"context"
 	"errors"
-	"image-previewer/pkg/previewer"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"image-previewer/pkg/previewer"
 
 	"github.com/gorilla/mux"
 )

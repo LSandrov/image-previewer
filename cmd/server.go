@@ -1,9 +1,10 @@
 package main
 
 import (
-	"image-previewer/internal"
 	"os"
 	"strconv"
+
+	"image-previewer/internal"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
@@ -17,7 +18,7 @@ func main() {
 	l := log.With().Str("sha_commit", shaCommit).Logger()
 
 	if err := godotenv.Load(); err != nil {
-		l.Fatal().Err(err).Msg("Error loading .env file")
+		l.Warn().Err(err).Msg("Error loading .env file")
 	}
 
 	cacheCapacity, err := strconv.Atoi(os.Getenv("LRU_CACHE_CAPACITY"))
