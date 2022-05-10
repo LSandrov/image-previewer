@@ -3,8 +3,7 @@ name: LSandrov image previewer
 on:
   push:
     branches:
-      - master
-      - previewer
+      - '*'
 
 jobs:
   go_get:
@@ -40,3 +39,5 @@ jobs:
       - name: Unit tests
         run: make test
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
