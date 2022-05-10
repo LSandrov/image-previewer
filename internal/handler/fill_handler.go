@@ -1,23 +1,17 @@
 package handler
 
 import (
+	"context"
 	"errors"
 	"github.com/gorilla/mux"
+	"image-previewer/pkg/previewer"
 	"net/http"
 	"net/url"
 	"strconv"
 )
 
-type FillRequest struct {
-	width  int
-	height int
-	url    string
-}
-
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	request, err := h.parseFillHandlerVars(vars)
+	fillParams, err := h.parseFillHandlerVars(r.Context(), mux.Vars(r), r.Header)
 	if err != nil {
 		w.WriteHeader(500)
 		h.l.Err(err).Msg("Ошибка при валидации входных данных")
@@ -25,7 +19,7 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fillResponse, err := h.svc.Fill(r.Context(), request.width, request.height, request.url)
+	fillResponse, err := h.svc.Fill(fillParams)
 	if err != nil {
 		w.WriteHeader(500)
 		h.l.Err(err).Msg("Невозможно обработать изображение")
@@ -48,31 +42,24 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) parseFillHandlerVars(vars map[string]string) (*FillRequest, error) {
-	r := &FillRequest{}
-
+func (h *Handlers) parseFillHandlerVars(ctx context.Context, vars map[string]string, headers map[string][]string) (*previewer.FillParams, error) {
 	width, err := strconv.Atoi(vars["width"])
 	if err != nil {
 		return nil, errors.New("поле width должно быть целочисленным")
 	}
-
-	r.width = width
 
 	height, err := strconv.Atoi(vars["height"])
 	if err != nil {
 		return nil, errors.New("поле width должно быть целочисленным")
 	}
 
-	r.height = height
-
 	imageUrl, err := url.Parse(vars["imageUrl"])
 	if err != nil {
 		return nil, errors.New("поле imageUrl должно быть ссылкой")
 	}
 
-	imageUrl.Scheme = "https"
+	//Условие тз: Работаем только с HTTP.
+	imageUrl.Scheme = "http"
 
-	r.url = imageUrl.String()
-
-	return r, nil
+	return previewer.NewFillParams(ctx, width, height, imageUrl.String(), headers), nil
 }

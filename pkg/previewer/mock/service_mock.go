@@ -5,7 +5,6 @@
 package mock_previewer
 
 import (
-	context "context"
 	previewer "image-previewer/pkg/previewer"
 	reflect "reflect"
 
@@ -36,16 +35,16 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // Fill mocks base method.
-func (m *MockService) Fill(ctx context.Context, width, height int, imgURL string) (*previewer.FillResponse, error) {
+func (m *MockService) Fill(params *previewer.FillParams) (*previewer.FillResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Fill", ctx, width, height, imgURL)
+	ret := m.ctrl.Call(m, "Fill", params)
 	ret0, _ := ret[0].(*previewer.FillResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Fill indicates an expected call of Fill.
-func (mr *MockServiceMockRecorder) Fill(ctx, width, height, imgURL interface{}) *gomock.Call {
+func (mr *MockServiceMockRecorder) Fill(params interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fill", reflect.TypeOf((*MockService)(nil).Fill), ctx, width, height, imgURL)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fill", reflect.TypeOf((*MockService)(nil).Fill), params)
 }

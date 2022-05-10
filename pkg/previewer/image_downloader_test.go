@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const ImageURL = "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/"
+const ImageURL = "http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/"
 
 func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 	ctx := context.Background()
@@ -17,6 +17,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 	tests := []struct {
 		ctx     context.Context
 		imgName string
+		headers map[string][]string
 	}{
 		{
 			ctx:     ctx,
@@ -30,7 +31,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.imgName, func(t *testing.T) {
 			d := &DefaultImageDownloader{}
-			gotImg, err := d.DownloadByUrl(tt.ctx, ImageURL+tt.imgName)
+			gotImg, err := d.DownloadByUrl(tt.ctx, ImageURL+tt.imgName, tt.headers)
 			if err != nil {
 				t.Errorf("DownloadByUrl() error = %v", err)
 				return
@@ -53,6 +54,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 		ctx     context.Context
 		imgName string
 		url     string
+		headers map[string][]string
 		err     error
 	}{
 		{
@@ -77,7 +79,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.imgName, func(t *testing.T) {
 			d := &DefaultImageDownloader{}
-			_, err := d.DownloadByUrl(tt.ctx, tt.url+tt.imgName)
+			_, err := d.DownloadByUrl(tt.ctx, tt.url+tt.imgName, tt.headers)
 			require.Errorf(t, err, tt.err.Error())
 		})
 	}

@@ -2,7 +2,7 @@ package cache
 
 type Cache interface {
 	Get(key string) (*Item, bool)
-	Set(i Item) bool
+	Set(i *Item) bool
 	MakeCacheKeyResizes(width, height int, url string) string
 	MakeCacheKeyDownloaded(url string) string
 	Clear()

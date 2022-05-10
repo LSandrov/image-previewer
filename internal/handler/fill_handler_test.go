@@ -36,7 +36,7 @@ func TestHandlers_FillHandler(t *testing.T) {
 			name:         "good",
 			width:        200,
 			height:       300,
-			url:          "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_200x700.jpg",
+			url:          "http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_200x700.jpg",
 			response:     string(image1),
 			fillResponse: &previewer.FillResponse{Img: image1},
 		},
@@ -44,7 +44,7 @@ func TestHandlers_FillHandler(t *testing.T) {
 			name:         "good1",
 			width:        300,
 			height:       400,
-			url:          "https://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_1024x252.jpg",
+			url:          "http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_1024x252.jpg",
 			response:     string(image2),
 			fillResponse: &previewer.FillResponse{Img: image2},
 		},
@@ -58,9 +58,9 @@ func TestHandlers_FillHandler(t *testing.T) {
 				"height":   strconv.Itoa(tt.height),
 				"imageUrl": tt.url,
 			})
-
+			fillParams := previewer.NewFillParams(req.Context(), tt.width, tt.height, tt.url, req.Header)
 			mockService := mock_previewer.NewMockService(ctrl)
-			mockService.EXPECT().Fill(req.Context(), tt.width, tt.height, tt.url).Return(tt.fillResponse, tt.err)
+			mockService.EXPECT().Fill(fillParams).Return(tt.fillResponse, tt.err)
 			h := &Handlers{
 				l:   l,
 				svc: mockService,

@@ -5,15 +5,17 @@ import (
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 var (
-	ErrTimeout = errors.New("download timeout")
-	ErrRequest = errors.New("error to create request")
+	ErrTimeout     = errors.New("таймаут загрузки изображения")
+	ErrRequest     = errors.New("ошибка при отправке запроса на загрузку")
+	ErrImgValidate = errors.New("файл не является изображением")
 )
 
 type ImageDownloader interface {
-	DownloadByUrl(ctx context.Context, url string) (*DownloadedImage, error)
+	DownloadByUrl(ctx context.Context, url string, headers map[string][]string) (*DownloadedImage, error)
 }
 
 type DefaultImageDownloader struct {
@@ -28,12 +30,15 @@ func NewDefaultImageDownloader() ImageDownloader {
 	return &DefaultImageDownloader{}
 }
 
-func (d *DefaultImageDownloader) DownloadByUrl(ctx context.Context, url string) (*DownloadedImage, error) {
+func (d *DefaultImageDownloader) DownloadByUrl(ctx context.Context, url string, headers map[string][]string) (*DownloadedImage, error) {
 	client := http.Client{}
 	req, err := http.NewRequest(http.MethodGet, url, nil)
+
 	if err != nil {
 		return nil, errors.Wrap(err, ErrRequest.Error())
 	}
+
+	req.Header = headers
 
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
@@ -45,11 +50,37 @@ func (d *DefaultImageDownloader) DownloadByUrl(ctx context.Context, url string) 
 		return nil, err
 	}
 
-	if err := resp.Body.Close(); err != nil {
+	if err := d.validate(img); err != nil {
 		return nil, err
 	}
 
 	downloadedImage := &DownloadedImage{img: img, headers: resp.Header}
 
+	if err := resp.Body.Close(); err != nil {
+		return nil, err
+	}
+
 	return downloadedImage, nil
+}
+
+func (d *DefaultImageDownloader) validate(img []byte) error {
+	if len(img) == 0 {
+		return ErrRequest
+	}
+
+	allowedFormats := map[string]string{
+		"\xff\xd8\xff":      "image/jpeg",
+		"\x89PNG\r\n\x1a\n": "image/png",
+		"GIF87a":            "image/gif",
+		"GIF89a":            "image/gif",
+	}
+
+	imgStr := string(img)
+	for format, _ := range allowedFormats {
+		if strings.HasPrefix(imgStr, format) {
+			return nil
+		}
+	}
+
+	return ErrImgValidate
 }

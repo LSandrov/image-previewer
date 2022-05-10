@@ -3,6 +3,7 @@ package previewer
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"github.com/disintegration/imaging"
 	"github.com/rs/zerolog"
@@ -16,59 +17,69 @@ import (
 // Service сервис для обрезки изображений
 type Service interface {
 	// Fill скачивает изображение, обрезает его. Данные кешируются
-	Fill(ctx context.Context, width, height int, imgURL string) (*FillResponse, error)
+	Fill(params *FillParams) (*FillResponse, error)
 }
 
 type DefaultService struct {
-	l          zerolog.Logger
-	downloader ImageDownloader
-	cache      cache.Cache
+	l               zerolog.Logger
+	downloader      ImageDownloader
+	resizedCache    cache.Cache
+	downloadedCache cache.Cache
 }
 
-func NewDefaultService(l zerolog.Logger, downloader ImageDownloader, c cache.Cache) Service {
-	return &DefaultService{l: l, downloader: downloader, cache: c}
+func NewDefaultService(l zerolog.Logger, downloader ImageDownloader, resizedCache cache.Cache, downloadedCache cache.Cache) Service {
+	return &DefaultService{
+		l:               l,
+		downloader:      downloader,
+		resizedCache:    resizedCache,
+		downloadedCache: downloadedCache,
+	}
 }
 
-func (svc *DefaultService) Fill(ctx context.Context, width, height int, imgURL string) (*FillResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(1000)*time.Second)
+func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
+	ctx, cancel := context.WithTimeout(params.ctx, time.Duration(5)*time.Second)
 	defer cancel()
 
-	cacheKey := svc.cache.MakeCacheKeyResizes(width, height, imgURL)
-	cached, ok := svc.cache.Get(cacheKey)
+	cacheKey := svc.resizedCache.MakeCacheKeyResizes(params.width, params.height, params.url)
+	cached, ok := svc.resizedCache.Get(cacheKey)
 
 	if ok {
 		fillResponse := NewFillResponse(cached.Img, cached.Header)
 		return fillResponse, nil
 	}
 
-	cacheKeyDownloaded := svc.cache.MakeCacheKeyDownloaded(imgURL)
-	cachedImage, ok := svc.cache.Get(cacheKeyDownloaded)
+	cacheKeyDownloaded := svc.downloadedCache.MakeCacheKeyDownloaded(params.url)
+	cachedImage, ok := svc.downloadedCache.Get(cacheKeyDownloaded)
+
+	var downloaded *DownloadedImage
 
 	if ok {
-		fillResponse := NewFillResponse(cachedImage.Img, cachedImage.Header)
+		downloaded = &DownloadedImage{img: cachedImage.Img, headers: cachedImage.Header}
+	} else {
+		downloaded, err := svc.downloader.DownloadByUrl(ctx, params.url, params.headers)
+		if err != nil {
+			svc.l.Err(err).Msg("Невозможно загрузить изображение")
+			return nil, err
+		}
 
-		return fillResponse, nil
+		go svc.downloadedCache.Set(&cache.Item{
+			Key:    cacheKeyDownloaded,
+			Img:    downloaded.img,
+			Header: downloaded.headers,
+		})
 	}
 
-	downloaded, err := svc.downloader.DownloadByUrl(ctx, imgURL)
-	if err != nil {
-		svc.l.Err(err).Msg("Невозможно загрузить изображение")
-		return nil, err
+	if downloaded == nil {
+		return nil, errors.New("ошибка при загрузке изображения")
 	}
 
-	svc.cache.Set(cache.Item{
-		Key:    cacheKeyDownloaded,
-		Img:    downloaded.img,
-		Header: downloaded.headers,
-	})
-
-	resizedImg, err := svc.resize(downloaded.img, width, height)
+	resizedImg, err := svc.resize(downloaded.img, params.width, params.height)
 	if err != nil {
 		svc.l.Err(err).Msg("Невозможно обрезать изображение")
 		return nil, err
 	}
 
-	svc.cache.Set(cache.Item{
+	go svc.resizedCache.Set(&cache.Item{
 		Key:    cacheKey,
 		Img:    resizedImg,
 		Header: downloaded.headers,

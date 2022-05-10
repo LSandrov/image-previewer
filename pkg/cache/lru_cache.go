@@ -22,7 +22,7 @@ func NewCache(capacity int) Cache {
 	}
 }
 
-func (c *lruCache) Set(i Item) bool {
+func (c *lruCache) Set(i *Item) bool {
 	c.mu.Lock()
 
 	defer c.mu.Unlock()
@@ -58,8 +58,8 @@ func (c *lruCache) Get(key string) (*Item, bool) {
 	if item, ok := c.items[key]; ok {
 		c.queue.MoveToFront(item)
 
-		cachedItem, ok := item.Value.(*Item)
-		if !ok {
+		cachedItem, okCache := item.Value.(*Item)
+		if okCache != true {
 			return nil, false
 		}
 

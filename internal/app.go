@@ -25,9 +25,10 @@ func NewApp(l zerolog.Logger, cacheCapacity int) *App {
 
 func (a *App) Run() {
 	r := mux.NewRouter()
-	c := cache.NewCache(a.cacheCapacity)
+	resizedCache := cache.NewCache(a.cacheCapacity)
+	downloadedCache := cache.NewCache(a.cacheCapacity)
 	downloader := previewer.NewDefaultImageDownloader()
-	svc := previewer.NewDefaultService(a.l, downloader, c)
+	svc := previewer.NewDefaultService(a.l, downloader, resizedCache, downloadedCache)
 	handlers := handler.NewHandlers(a.l, svc)
 
 	r.HandleFunc("/fill/{width:[0-9]+}/{height:[0-9]+}/{imageUrl:.*}", handlers.FillHandler)
