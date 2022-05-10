@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/LSandrov/image-previewer/pkg/previewer"
 
@@ -13,6 +14,11 @@ import (
 )
 
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	defer cancel()
+
+	r.WithContext(ctx)
+
 	fillParams, err := h.parseFillHandlerVars(r.Context(), mux.Vars(r), r.Header)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

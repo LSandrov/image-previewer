@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"image-previewer/internal"
+	"github.com/LSandrov/image-previewer/internal"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"

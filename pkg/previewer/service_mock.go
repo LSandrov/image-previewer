@@ -2,10 +2,9 @@
 // Source: service.go
 
 // Package mock_previewer is a generated GoMock package.
-package mock_previewer
+package previewer
 
 import (
-	previewer "github.com/LSandrov/image-previewer/pkg/previewer"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,10 +34,10 @@ func (m *MockService) EXPECT() *MockServiceMockRecorder {
 }
 
 // Fill mocks base method.
-func (m *MockService) Fill(params *previewer.FillParams) (*previewer.FillResponse, error) {
+func (m *MockService) Fill(params *FillParams) (*FillResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Fill", params)
-	ret0, _ := ret[0].(*previewer.FillResponse)
+	ret0, _ := ret[0].(*FillResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
