@@ -32,7 +32,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.imgName, func(t *testing.T) {
 			d := &DefaultImageDownloader{}
-			gotImg, err := d.DownloadByUrl(tt.ctx, ImageURL+tt.imgName, tt.headers)
+			gotImg, err := d.DownloadByURL(tt.ctx, ImageURL+tt.imgName, tt.headers)
 			if err != nil {
 				t.Errorf("DownloadByUrl() error = %v", err)
 				return
@@ -80,7 +80,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.imgName, func(t *testing.T) {
 			d := &DefaultImageDownloader{}
-			_, err := d.DownloadByUrl(tt.ctx, tt.url+tt.imgName, tt.headers)
+			_, err := d.DownloadByURL(tt.ctx, tt.url+tt.imgName, tt.headers)
 			require.Errorf(t, err, tt.err.Error())
 		})
 	}
