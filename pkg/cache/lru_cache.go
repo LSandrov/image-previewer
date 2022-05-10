@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"image-previewer/pkg/cache/lru"
 	"sync"
 )
@@ -12,11 +13,6 @@ type lruCache struct {
 	mu       *sync.Mutex
 }
 
-type cacheItem struct {
-	key   string
-	value interface{}
-}
-
 func NewCache(capacity int) Cache {
 	return &lruCache{
 		capacity: capacity,
@@ -26,36 +22,35 @@ func NewCache(capacity int) Cache {
 	}
 }
 
-func (c *lruCache) Set(key string, value interface{}) bool {
+func (c *lruCache) Set(i *Item) bool {
 	c.mu.Lock()
 
 	defer c.mu.Unlock()
 
-	item := &cacheItem{key: key, value: value}
-	if i, ok := c.items[key]; ok {
-		i.Value = item
-		c.queue.MoveToFront(i)
+	if lruItem, ok := c.items[i.Key]; ok {
+		lruItem.Value = i
+		c.queue.MoveToFront(lruItem)
 
 		return true
 	}
 
 	if c.queue.Len() == c.capacity {
-		lastItem, ok := c.queue.Back().Value.(*cacheItem)
+		lastItem, ok := c.queue.Back().Value.(*Item)
 		if !ok {
 			return false
 		}
 
 		c.queue.Remove(c.queue.Back())
-		delete(c.items, lastItem.key)
+		delete(c.items, lastItem.Key)
 	}
 
-	pushed := c.queue.PushFront(item)
-	c.items[key] = pushed
+	pushed := c.queue.PushFront(i)
+	c.items[i.Key] = pushed
 
 	return false
 }
 
-func (c *lruCache) Get(key string) (interface{}, bool) {
+func (c *lruCache) Get(key string) (*Item, bool) {
 	c.mu.Lock()
 
 	defer c.mu.Unlock()
@@ -63,12 +58,12 @@ func (c *lruCache) Get(key string) (interface{}, bool) {
 	if item, ok := c.items[key]; ok {
 		c.queue.MoveToFront(item)
 
-		cachedItem, ok := item.Value.(*cacheItem)
+		cachedItem, ok := item.Value.(*Item)
 		if !ok {
 			return nil, false
 		}
 
-		return cachedItem.value, true
+		return cachedItem, true
 	}
 
 	return nil, false
@@ -77,4 +72,12 @@ func (c *lruCache) Get(key string) (interface{}, bool) {
 func (c *lruCache) Clear() {
 	c.queue = lru.NewList()
 	c.items = make(map[string]*lru.Item, c.capacity)
+}
+
+func (c *lruCache) MakeCacheKeyResizes(width, height int, url string) string {
+	return fmt.Sprintf("%d_%d_%s", width, height, url)
+}
+
+func (c *lruCache) MakeCacheKeyDownloaded(url string) string {
+	return url
 }

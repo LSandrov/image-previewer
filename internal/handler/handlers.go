@@ -1,8 +1,16 @@
 package handler
 
-type Handlers struct{}
+import (
+	"image-previewer/pkg/previewer"
 
-func NewHandlers() *Handlers {
-	//@TODO fixme
-	return &Handlers{}
+	"github.com/rs/zerolog"
+)
+
+type Handlers struct {
+	l   zerolog.Logger
+	svc previewer.Service
+}
+
+func NewHandlers(l zerolog.Logger, svc previewer.Service) *Handlers {
+	return &Handlers{l: l, svc: svc}
 }
