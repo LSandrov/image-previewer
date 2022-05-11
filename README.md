@@ -2,6 +2,7 @@
 
 ![workflow](https://github.com/LSandrov/image-previewer/actions/workflows/tests.yml/badge.svg?branch=master)
 [![codecov](https://codecov.io/gh/LSandrov/image-previewer/branch/master/graph/badge.svg?token=TAAM8J01Y9)](https://codecov.io/gh/LSandrov/image-previewer)
+[![GoReportCard example](https://goreportcard.com/badge/github.com/LSandrov/image-previewer)](https://goreportcard.com/report/github.com/LSandrov/image-previewer)
 
 
 Сервис предназначен для изготовления preview (создания изображения с новыми размерами на основе имеющегося изображения).
