@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/LSandrov/image-previewer/pkg/previewer"
-	mock_previewer "github.com/LSandrov/image-previewer/pkg/previewer/mock"
 
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
@@ -21,7 +20,7 @@ func TestHandlers_FillHandler_Positive(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockService := mock_previewer.NewMockService(ctrl)
+	mockService := previewer.NewMockService(ctrl)
 	l := log.With().Logger()
 
 	image1 := loadImage("gopher_200x700.jpg")
@@ -85,7 +84,7 @@ func TestHandlers_FillHandler_Negative(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockService := mock_previewer.NewMockService(ctrl)
+	mockService := previewer.NewMockService(ctrl)
 	l := log.With().Logger()
 
 	tests := []struct {

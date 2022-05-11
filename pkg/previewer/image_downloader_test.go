@@ -22,7 +22,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Positive(t *testing.T) {
 	}{
 		{
 			ctx:     ctx,
-			imgName: "gopher_200x700.jpg",
+			imgName: "_gopher_original_1024x504.jpg",
 		},
 		{
 			ctx:     ctx,
@@ -60,7 +60,7 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 	}{
 		{
 			ctx:     ctxWithTimeOut,
-			imgName: "gopher_200x700.jpg",
+			imgName: "_gopher_original_1024x504.jpg",
 			url:     ImageURL,
 			err:     ErrTimeout,
 		},

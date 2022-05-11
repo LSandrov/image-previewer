@@ -2,14 +2,14 @@ package previewer
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"fmt"
-	"github.com/LSandrov/image-previewer/pkg/cache"
 	"image/jpeg"
 	"io"
 	"os"
 	"time"
+
+	"github.com/LSandrov/image-previewer/pkg/cache"
 
 	"github.com/disintegration/imaging"
 	"github.com/rs/zerolog"
@@ -43,9 +43,6 @@ func NewDefaultService(
 }
 
 func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
-	ctx, cancel := context.WithTimeout(params.ctx, time.Duration(5)*time.Second)
-	defer cancel()
-
 	cacheKey := svc.resizedCache.MakeCacheKeyResizes(params.width, params.height, params.url)
 	cached, ok := svc.resizedCache.Get(cacheKey)
 
@@ -58,11 +55,12 @@ func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
 	cachedImage, ok := svc.downloadedCache.Get(cacheKeyDownloaded)
 
 	var downloaded *DownloadedImage
+	var err error
 
 	if ok {
 		downloaded = &DownloadedImage{img: cachedImage.Img, headers: cachedImage.Header}
 	} else {
-		downloaded, err := svc.downloader.DownloadByURL(ctx, params.url, params.headers)
+		downloaded, err = svc.downloader.DownloadByURL(params.ctx, params.url, params.headers)
 		if err != nil {
 			svc.l.Err(err).Msg("Невозможно загрузить изображение")
 			return nil, err
@@ -97,7 +95,7 @@ func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
 }
 
 func (svc *DefaultService) resize(img []byte, width, height int) ([]byte, error) {
-	tmpImgName := fmt.Sprintf("%d.jpg", time.Now().Unix())
+	tmpImgName := fmt.Sprintf("./%d.jpg", time.Now().Unix())
 
 	file, err := os.Create(tmpImgName)
 	if err != nil {
