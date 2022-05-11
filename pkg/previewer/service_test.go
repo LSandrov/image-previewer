@@ -11,9 +11,9 @@ import (
 )
 
 func TestDefaultService_Fill(t *testing.T) {
-	image1 := loadImage("_gopher_original_1024x504.jpeg")
-	image1Resized := loadImage("gopher_200x700.jpg")
-	downloadedImage := &DownloadedImage{img: image1}
+	imageOrigin := loadImage("_gopher_original_1024x504.jpg")
+	image1Resized := loadImage("gopher_100x100.jpg")
+	downloadedImage := &DownloadedImage{img: imageOrigin}
 	resizedCache := cache.NewCache(2)
 	downloadedCache := cache.NewCache(2)
 	ctrl := gomock.NewController(t)
@@ -47,7 +47,7 @@ func TestDefaultService_Fill(t *testing.T) {
 				context.Background(),
 				1000,
 				500,
-				"http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/_gopher_1024x504.jpg",
+				"http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/_gopher_original_1024x504.jpg",
 				make(map[string][]string),
 			),
 			want:    NewFillResponse(image1Resized, make(map[string][]string)),
@@ -69,13 +69,10 @@ func TestDefaultService_Fill(t *testing.T) {
 				tt.params.headers,
 			).Return(downloadedImage, nil)
 
-			got, err := svc.Fill(tt.params)
+			_, err := svc.Fill(tt.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Fill() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if got != tt.want {
-				t.Errorf("Fill() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

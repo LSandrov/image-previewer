@@ -94,7 +94,7 @@ func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
 }
 
 func (svc *DefaultService) resize(img []byte, width, height int) ([]byte, error) {
-	tmpImgName := fmt.Sprintf("%d.jpg", time.Now().Unix())
+	tmpImgName := fmt.Sprintf("./%d.jpg", time.Now().Unix())
 
 	file, err := os.Create(tmpImgName)
 	if err != nil {

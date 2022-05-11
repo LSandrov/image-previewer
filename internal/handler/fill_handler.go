@@ -39,6 +39,7 @@ func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	w.Header().Set("Content-Length", strconv.Itoa(len(fillResponse.Img)))
 	if _, err := w.Write(fillResponse.Img); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		h.l.Err(err).Msg("Проблемы с обработкой ответа")

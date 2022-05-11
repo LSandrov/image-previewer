@@ -51,7 +51,7 @@ cover:
 
 .PHONY: docker-up
 docker-up: ## Start containers
-	make build && docker-compose up -d
+	env UID=${UID} GID=${GID} docker-compose up --build -d
 
 .PHONY: docker-down
 docker-down: ## Stop containers
