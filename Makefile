@@ -55,7 +55,7 @@ test-e2e:
 
 .PHONY: run
 run:
-	env UID=${UID} GID=${GID} docker-compose up -d
+	docker-compose up -d
 
 .PHONY: stop
 stop:
