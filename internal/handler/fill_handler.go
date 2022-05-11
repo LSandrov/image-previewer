@@ -3,21 +3,15 @@ package handler
 import (
 	"context"
 	"errors"
+	"github.com/LSandrov/image-previewer/pkg/previewer"
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
-
-	"github.com/LSandrov/image-previewer/pkg/previewer"
 
 	"github.com/gorilla/mux"
 )
 
 func (h *Handlers) FillHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
-	defer cancel()
-
-	r = r.WithContext(ctx)
 	fillParams, err := h.parseFillHandlerVars(r.Context(), mux.Vars(r), r.Header)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
