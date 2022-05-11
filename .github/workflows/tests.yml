@@ -51,4 +51,4 @@ jobs:
           verbose: true # optional (default = false)
 
       - name: E2E tests
-        run: make run && docker-compose logs && docker-compose ps && make test-e2e
+        run: make run && make test-e2e
