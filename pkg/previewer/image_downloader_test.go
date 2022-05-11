@@ -2,7 +2,6 @@ package previewer
 
 import (
 	"context"
-	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -72,9 +71,9 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 		},
 		{
 			ctx:     ctx,
-			imgName: "",
-			url:     "",
-			err:     errors.New("unsupported protocol scheme"),
+			imgName: "Makefile",
+			url:     "https://raw.githubusercontent.com/LSandrov/image-previewer/master/",
+			err:     ErrImgValidate,
 		},
 	}
 	for _, tt := range tests {
@@ -100,6 +99,47 @@ func TestNewDefaultImageDownloader(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NewDefaultImageDownloader(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewDefaultImageDownloader() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDefaultImageDownloader_validate(t *testing.T) {
+	type args struct {
+		img []byte
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "good",
+			args: args{
+				img: loadImage("gopher_100x100.jpg"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "bad format",
+			args: args{
+				img: loadImage("img.txt"),
+			},
+			wantErr: true,
+		},
+		{
+			name: "empty img",
+			args: args{
+				img: loadImage("empty_img.jpg"),
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &DefaultImageDownloader{}
+			if err := d.validate(tt.args.img); (err != nil) != tt.wantErr {
+				t.Errorf("validate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
