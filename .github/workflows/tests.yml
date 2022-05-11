@@ -47,8 +47,5 @@ jobs:
           fail_ci_if_error: true # optional (default = false)
           verbose: true # optional (default = false)
 
-      - name: Build container
-        run: make run
-
       - name: E2E tests
-        run: make test-e2e
+        run: make run && docker-compose ps
