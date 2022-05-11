@@ -39,7 +39,7 @@ jobs:
       - name: Unit tests
         run: make test
 
-      - name: E2e tests
+      - name: E2E tests
         run: make run && make test-e2e
 
       - name: Upload coverage to Codecov

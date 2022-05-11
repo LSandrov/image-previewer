@@ -4,8 +4,8 @@ networks:
   previewer:
 
 services:
-  go_build:
-    container_name: ipreviewer
+  image-previewer:
+    container_name: image-previewer
     build:
       context: .
       dockerfile: Dockerfile
@@ -23,9 +23,9 @@ services:
     volumes:
       - ./build/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     links:
-      - go_build
+      - image-previewer
     depends_on:
-      - go_build
+      - image-previewer
     networks:
       - previewer
     healthcheck:
