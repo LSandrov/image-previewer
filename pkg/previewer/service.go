@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/LSandrov/image-previewer/pkg/cache"
 	"image/jpeg"
 	"io"
 	"os"
 	"time"
+
+	"github.com/LSandrov/image-previewer/pkg/cache"
 
 	"github.com/disintegration/imaging"
 	"github.com/rs/zerolog"
