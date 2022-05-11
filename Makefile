@@ -24,7 +24,7 @@ build:
 ################################################################################################ clear
 
 .PHONY: clear
-clear: ## Clear the working area and the project
+clear:
 	rm -rf bin/*
 
 ################################################################################################ lint
@@ -36,7 +36,7 @@ lint:
 ################################################################################################ test
 
 .PHONY: test
-test: ## Run test ./pkg/... ./internal/...
+test:
 	$(GO) test -race -cover -short -v \
 				-coverprofile profile.cov.tmp -p 2 \
 				./pkg/... ./internal/...
@@ -47,12 +47,16 @@ test: ## Run test ./pkg/... ./internal/...
 cover:
 	$(GO) tool cover -func profile.cov
 
+.PHONY: test-e2e
+test-e2e:
+	$(GO) clean -testcache
+	$(GO) test -short ./e2e/... -v
 ################################################################################################ docker
 
-.PHONY: docker-up
-docker-up: ## Start containers
-	env UID=${UID} GID=${GID} docker-compose up --build -d
+.PHONY: run
+run:
+	docker-compose up -d
 
-.PHONY: docker-down
-docker-down: ## Stop containers
+.PHONY: stop
+stop:
 	docker-compose down
