@@ -8,8 +8,6 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		Url    string
 		Status int
