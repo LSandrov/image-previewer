@@ -144,3 +144,68 @@ func TestHandlers_FillHandler_Negative(t *testing.T) {
 		})
 	}
 }
+
+func TestHandlers_FillHandler_Headers(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockService := previewer.NewMockService(ctrl)
+	l := log.With().Logger()
+
+	image1 := loadImage("gopher_200x700.jpg")
+
+	headers := map[string][]string{
+		"Source-Age":                  {0: "3"},
+		"Access-Control-Allow-Origin": {0: "*"},
+		"Content-Length":              {0: "30146"},
+		"Content-Type":                {0: "image/jpeg"},
+	}
+
+	tests := []struct {
+		name         string
+		width        int64
+		height       int64
+		url          string
+		response     string
+		fillResponse *previewer.FillResponse
+		err          error
+		httpStatus   int64
+	}{
+		{
+			name:         "good headers",
+			width:        200,
+			height:       300,
+			url:          "http://raw.githubusercontent.com/OtusGolang/final_project/master/examples/image-previewer/gopher_200x700.jpg",
+			response:     string(image1),
+			fillResponse: &previewer.FillResponse{Img: image1, Headers: headers},
+			httpStatus:   http.StatusOK,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "http://example.com", nil)
+			req = mux.SetURLVars(req, map[string]string{
+				"width":    strconv.Itoa(int(tt.width)),
+				"height":   strconv.Itoa(int(tt.height)),
+				"imageURL": tt.url,
+			})
+
+			fillParams := previewer.NewFillParams(req.Context(), int(tt.width), int(tt.height), tt.url, req.Header)
+			mockService.EXPECT().Fill(fillParams).Return(tt.fillResponse, tt.err)
+			h := &Handlers{
+				l:   l,
+				svc: mockService,
+			}
+
+			w := httptest.NewRecorder()
+			h.FillHandler(w, req)
+
+			for name, values := range tt.fillResponse.Headers {
+				for _, value := range values {
+					require.Equal(t, value, w.Header().Get(name))
+				}
+			}
+		})
+	}
+}
