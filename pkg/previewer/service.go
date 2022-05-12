@@ -66,7 +66,7 @@ func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
 			return nil, err
 		}
 
-		go svc.downloadedCache.Set(&cache.Item{
+		svc.downloadedCache.Set(&cache.Item{
 			Key:    cacheKeyDownloaded,
 			Img:    downloaded.img,
 			Header: downloaded.headers,
@@ -83,7 +83,7 @@ func (svc *DefaultService) Fill(params *FillParams) (*FillResponse, error) {
 		return nil, err
 	}
 
-	go svc.resizedCache.Set(&cache.Item{
+	svc.resizedCache.Set(&cache.Item{
 		Key:    cacheKey,
 		Img:    resizedImg,
 		Header: downloaded.headers,
