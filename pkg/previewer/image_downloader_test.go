@@ -2,6 +2,7 @@ package previewer
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
@@ -74,6 +75,12 @@ func TestDefaultImageDownloader_DownloadByUrl_Negative(t *testing.T) {
 			imgName: "Makefile",
 			url:     "https://raw.githubusercontent.com/LSandrov/image-previewer/master/",
 			err:     ErrImgValidate,
+		},
+		{
+			ctx:     ctx,
+			imgName: "",
+			url:     string(rune(0x7f)),
+			err:     errors.New("net/url: invalid control character in URL"),
 		},
 	}
 	for _, tt := range tests {
