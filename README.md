@@ -1,6 +1,6 @@
 # Image Previewer
 
-![workflow](https://github.com/LSandrov/image-previewer/actions/workflows/tests.yml/badge.svg?branch=master)
+[![workflow](https://github.com/LSandrov/image-previewer/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/LSandrov/image-previewer/actions)
 [![codecov](https://codecov.io/gh/LSandrov/image-previewer/branch/master/graph/badge.svg?token=TAAM8J01Y9)](https://codecov.io/gh/LSandrov/image-previewer)
 [![GoReportCard example](https://goreportcard.com/badge/github.com/LSandrov/image-previewer)](https://goreportcard.com/report/github.com/LSandrov/image-previewer)
 
